@@ -2,7 +2,6 @@ import os.path
 import sys
 import json
 import time
-import logging
 
 import smtplib
 from email.mime.multipart import MIMEMultipart
@@ -11,7 +10,7 @@ from email.mime.text import MIMEText
 FILENAME = "res.json"
 previous_count = 0
 previous_data = None
-logger = logging.getLogger()
+CONFIGFILE = "lbcscrap.config.json"
 
 
 ############################# UTILS ############################
@@ -59,7 +58,7 @@ def delete_res():
 
 def run_scrapper():
     print("[" + time.ctime() + "] :: Running scrapper for: " + start_url)
-    os.system("scrapy runspider crawler.py --nolog -a start_url=" + start_url + " -o " + FILENAME)
+    os.system("scrapy runspider crawler.py --nolog -a start_url=\"" + start_url + "\" -o " + FILENAME)
 
 
 # check if an offer has been added and returns the list of new offers
@@ -69,7 +68,8 @@ def offer_added(previous_data, new_data):
     return [o for o in new_data if o not in previous_data]
 
 
-def get_arg(argv, option):
+def get_arg(option):
+    argv = sys.argv
     if option in argv:
         index = argv.index(option)
         if not index == len(argv) - 1 and not argv[index + 1].startswith('-'):
@@ -79,20 +79,20 @@ def get_arg(argv, option):
 ################################################################
 
 if len(sys.argv) < 3 and not os.path.exists('lbcscrap.config.json'):
-    print('You need to fill at least the lbcscrap.config.jsonor to provide arguments.')
+    print('You need to fill at least the ' + CONFIGFILE + ' or to provide arguments.')
     print('Usage: run.py [-u url] [-t email_to] [-f email_from] [-p email_password]')
     exit(1)
 
-start_url = get_arg(sys.argv, "-u")
-email_from = get_arg(sys.argv, "-f")
-email_to = get_arg(sys.argv, "-t")
-email_password = get_arg(sys.argv, "-p")
+start_url = get_arg("-u")
+email_from = get_arg("-f")
+email_to = get_arg("-t")
+email_password = get_arg("-p")
 
 if None in [start_url, email_to, email_password]:
     try:
         conf = None
-        if os.path.exists('lbcscrap.config.json'):
-            with open('lbcscrap.config.json') as config:
+        if os.path.exists(CONFIGFILE):
+            with open(CONFIGFILE) as config:
                 conf = json.load(config)
                 if start_url == None:
                     start_url = conf['url']
