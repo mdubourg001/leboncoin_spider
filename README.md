@@ -1,5 +1,5 @@
 # leboncoin_spider
-A python script scrapping the Leboncoin's URL you give it every 30 seconds and send you an e-mail when new offers pop.
+This is a python script scraping Leboncoin. The URL you give will be scraped every 30 seconds and will alert you by e-mail when new offers pop out.
 
 ##### Dependencies:
 - Python 3.5
